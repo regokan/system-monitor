@@ -1,5 +1,5 @@
-#include <curses.h>
 #include <chrono>
+#include <curses.h>
 #include <string>
 #include <thread>
 #include <vector>
