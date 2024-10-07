@@ -89,10 +89,12 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
 }
 
 void NCursesDisplay::Display(System& system, int n) {
-  initscr();      // start ncurses
-  noecho();       // do not print input values
-  cbreak();       // terminate ncurses on ctrl + c
-  start_color();  // enable color
+  initscr();              // start ncurses
+  noecho();               // do not print input values
+  cbreak();               // terminate ncurses on ctrl + c
+  start_color();          // enable color
+  nodelay(stdscr, TRUE);  // Make getch() non-blocking
+  int ch;
 
   int x_max{getmaxx(stdscr)};
   WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
@@ -109,6 +111,13 @@ void NCursesDisplay::Display(System& system, int n) {
     wrefresh(system_window);
     wrefresh(process_window);
     refresh();
+
+    // Check if the 'q' key is pressed to exit
+    ch = getch();
+    if (ch == 'q') {
+      break;  // Exit the loop if 'q' is pressed
+    }
+
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   endwin();
