@@ -131,7 +131,6 @@ long LinuxParser::Jiffies() {
 }
 
 // Read and return the number of active jiffies for a PID
-// REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::ActiveJiffies(int pid) {
   std::string line, value;
   std::ifstream filestream(kProcDirectory + std::to_string(pid) +
