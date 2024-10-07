@@ -12,5 +12,10 @@ add_executable(monitor ${SOURCES})
 
 set_property(TARGET monitor PROPERTY CXX_STANDARD 17)
 target_link_libraries(monitor ${CURSES_LIBRARIES})
-# TODO: Run -Werror in CI.
 target_compile_options(monitor PRIVATE -Wall -Wextra)
+
+option(ENABLE_WERROR "Treat all warnings as errors (-Werror)" OFF)
+
+if (ENABLE_WERROR)
+  target_compile_options(monitor PRIVATE -Werror)
+endif()
