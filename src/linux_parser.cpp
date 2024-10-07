@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <filesystem>
 #include <iterator>
 #include <string>
 #include <unistd.h>
@@ -11,7 +12,7 @@ using std::string;
 using std::to_string;
 using std::vector;
 
-// DONE: An example of how to read data from the filesystem
+// Read and return the system's CPU
 string LinuxParser::OperatingSystem() {
   string line;
   string key;
@@ -34,7 +35,7 @@ string LinuxParser::OperatingSystem() {
   return value;
 }
 
-// DONE: An example of how to read data from the filesystem
+// Read and return the system's kernel
 string LinuxParser::Kernel() {
   string os, version, kernel;
   string line;
@@ -47,26 +48,26 @@ string LinuxParser::Kernel() {
   return kernel;
 }
 
-// BONUS: Update this to use std::filesystem
+// Return a vector composed of the system's processes
 vector<int> LinuxParser::Pids() {
   vector<int> pids;
-  DIR* directory = opendir(kProcDirectory.c_str());
-  struct dirent* file;
-  while ((file = readdir(directory)) != nullptr) {
-    // Is this a directory?
-    if (file->d_type == DT_DIR) {
-      // Is every character of the name a digit?
-      string filename(file->d_name);
+
+  for (const auto& entry :
+       std::filesystem::directory_iterator(kProcDirectory)) {
+    if (entry.is_directory()) {
+      // Extract the filename from the directory entry
+      string filename = entry.path().filename().string();
+
+      // Check if the filename consists only of digits (i.e., it's a PID)
       if (std::all_of(filename.begin(), filename.end(), isdigit)) {
         int pid = stoi(filename);
         pids.push_back(pid);
       }
     }
   }
-  closedir(directory);
+
   return pids;
 }
-
 // Read and return the system memory utilization
 float LinuxParser::MemoryUtilization() {
   string line;
@@ -345,8 +346,9 @@ long LinuxParser::UpTime(int pid) {
         (std::istream_iterator<std::string>(linestream)),
         std::istream_iterator<std::string>());
     if (values.size() > 21) {
-      starttime = std::stol(values[21]) /
-                  sysconf(_SC_CLK_TCK);  // converting from clock ticks to seconds
+      starttime =
+          std::stol(values[21]) /
+          sysconf(_SC_CLK_TCK);  // converting from clock ticks to seconds
     }
   }
   return starttime;
