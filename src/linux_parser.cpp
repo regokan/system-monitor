@@ -1,5 +1,5 @@
 #include <dirent.h>
-#include <filesystem>
+#include <experimental/filesystem>
 #include <iterator>
 #include <string>
 #include <unistd.h>
@@ -53,8 +53,8 @@ vector<int> LinuxParser::Pids() {
   vector<int> pids;
 
   for (const auto& entry :
-       std::filesystem::directory_iterator(kProcDirectory)) {
-    if (entry.is_directory()) {
+       std::experimental::filesystem::directory_iterator(kProcDirectory)) {
+    if (std::experimental::filesystem::is_directory(entry.status())) {
       // Extract the filename from the directory entry
       string filename = entry.path().filename().string();
 
